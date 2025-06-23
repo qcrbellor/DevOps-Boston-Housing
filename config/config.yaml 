@@ -1,0 +1,94 @@
+# Configuration file for Boston Housing ML Pipeline
+
+# Data Configuration
+data:
+  source_url: "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+  local_path: "data/boston_housing.csv"
+  test_size: 0.2
+  random_state: 42
+  target_column: "medv"
+
+# Model Configuration
+model:
+  type: "RandomForestRegressor"
+  hyperparameters:
+    n_estimators: 100
+    max_depth: 10
+    random_state: 42
+    n_jobs: -1
+  
+# Training Configuration
+training:
+  validation_split: 0.2
+  cross_validation_folds: 5
+  metric_threshold:
+    r2_score: 0.7
+    mae: 5.0
+
+# MLflow Configuration
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "boston-housing-prediction"
+  model_name: "boston-housing-model"
+
+# Azure ML Configuration
+azure_ml:
+  subscription_id: "${AZURE_SUBSCRIPTION_ID}"
+  resource_group: "${AZURE_RESOURCE_GROUP}"
+  workspace_name: "${AZURE_ML_WORKSPACE}"
+  compute_target: "cpu-cluster"
+
+# API Configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  title: "Boston Housing Price Prediction API"
+  description: "ML API for predicting Boston housing prices"
+  version: "1.0.0"
+
+# Monitoring Configuration
+monitoring:
+  metrics_port: 8001
+  log_level: "INFO"
+  drift_detection:
+    reference_window_size: 1000
+    current_window_size: 100
+    drift_threshold: 0.5
+
+# Kubernetes Configuration
+kubernetes:
+  namespace: "ml-housing"
+  deployment_name: "housing-api"
+  service_name: "housing-service"
+  replicas: 3
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+# Storage Configuration
+storage:
+  model_path: "models/"
+  data_path: "data/"
+  logs_path: "logs/"
+  
+# Feature Engineering
+features:
+  numerical_features:
+    - "crim"
+    - "zn"
+    - "indus"
+    - "nox"
+    - "rm"
+    - "age"
+    - "dis"
+    - "rad"
+    - "tax"
+    - "ptratio"
+    - "b"
+    - "lstat"
+  categorical_features:
+    - "chas"
