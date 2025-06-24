@@ -1,6 +1,6 @@
 # ML DevOps - Predicción de Precios de Viviendas
 
-Este proyecto implementa una solución de MLOps para un modelo de predicción de precios de viviendas basado en el dataset de [Boston Housing](https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv). La solución no es única e incluye pipeline de entrenamiento, containerización, despliegue, y monitoreo en producción.
+Este proyecto implementa una solución de MLOps para un modelo de predicción de precios de viviendas basado en el dataset de [Boston Housing](https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv). La solución no es única e incluye un pipeline de entrenamiento, containerización, despliegue, y monitoreo en producción. Nota: Se ha usado el modelo de lenguaje Claude para crear la estructura del proyecto.
 
 ## 🏗️ Arquitectura del Sistema
 
@@ -26,7 +26,7 @@ Este proyecto implementa una solución de MLOps para un modelo de predicción de
 ## 🚀 Tecnologías Utilizadas
 
 ### Core ML Stack
-- **Python 3.9+**: Lenguaje principal
+- **Python 3.9**: Lenguaje principal
 - **scikit-learn**: Modelo de regresión
 - **pandas**: Manipulación de datos
 - **numpy**: Operaciones numéricas
@@ -233,14 +233,12 @@ chmod +x scripts/deploy.sh
 
 ## 🔧 Uso de la API
 
-### Endpoints Disponibles
-
 #### 1. Health Check
 ```bash
 GET /health
 ```
 
-#### 2. Predicción Individual
+#### 2. Predicción
 ```bash
 POST /predict
 Content-Type: application/json
@@ -288,7 +286,7 @@ Content-Type: application/json
 GET /metrics
 ```
 
-### Ejemplos de Uso
+### Ejemplo
 
 #### cURL
 ```bash
@@ -352,7 +350,6 @@ print(f"Predicted price: ${result['prediction']:.2f}")
 ### Configuración de Prometheus
 
 ```yaml
-# prometheus-config.yaml
 global:
   scrape_interval: 15s
 
@@ -435,23 +432,6 @@ pytest tests/test_pipeline.py -v
 # Tests con cobertura
 pytest tests/ --cov=src --cov-report=html
 ```
-
-### Tipos de Tests
-
-#### 1. Unit Tests
-- Tests de funciones individuales
-- Validación de modelos
-- Tests de transformaciones de datos
-
-#### 2. Integration Tests
-- Tests de API endpoints
-- Tests de pipeline completo
-- Tests de conexiones a bases de datos
-
-#### 3. Performance Tests
-- Tests de carga con locust
-- Tests de latencia
-- Tests de throughput
 
 ### Ejecutar Tests de Carga
 
