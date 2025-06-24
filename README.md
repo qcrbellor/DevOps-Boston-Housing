@@ -1,8 +1,6 @@
 # ML DevOps - Predicción de Precios de Viviendas
 
-## 📋 Descripción del Proyecto
-
-Este proyecto implementa una solución completa de MLOps para un modelo de predicción de precios de viviendas basado en el dataset de Boston Housing. La solución incluye pipeline de entrenamiento automatizado, containerización, despliegue en la nube, y monitoreo en producción.
+Este proyecto implementa una solución de MLOps para un modelo de predicción de precios de viviendas basado en el dataset de [Boston Housing](https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv). La solución no es única e incluye pipeline de entrenamiento, containerización, despliegue, y monitoreo en producción.
 
 ## 🏗️ Arquitectura del Sistema
 
@@ -37,7 +35,7 @@ Este proyecto implementa una solución completa de MLOps para un modelo de predi
 - **MLflow**: Tracking de experimentos y registro de modelos
 - **FastAPI**: API REST para servir el modelo
 - **Docker**: Containerización
-- **Kubernetes**: Orquestación de contenedores
+- **Kubernetes**: Orquestación de los contenedores
 
 ### Cloud & Infrastructure
 - **Azure Kubernetes Service (AKS)**: Despliegue en producción
@@ -47,72 +45,8 @@ Este proyecto implementa una solución completa de MLOps para un modelo de predi
 ### Monitoring
 - **Prometheus**: Métricas del sistema
 - **Grafana**: Visualización y dashboards
-- **Custom Metrics**: Monitoreo específico del modelo
-
-## 📁 Estructura del Proyecto
-
-```
-ml-devops-housing-prediction/
-├── .github/
-│   └── workflows/
-│       ├── ci-cd.yml
-│       └── model-training.yml
-├── src/
-│   ├── __init__.py
-│   ├── data/
-│   │   ├── __init__.py
-│   │   └── loader.py
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── trainer.py
-│   │   └── predictor.py
-│   ├── api/
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   └── schemas.py
-│   └── monitoring/
-│       ├── __init__.py
-│       └── metrics.py
-├── pipelines/
-│   ├── training_pipeline.py
-│   └── azure_ml_pipeline.py
-├── docker/
-│   ├── Dockerfile
-│   └── docker-compose.yml
-├── k8s/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   ├── configmap.yaml
-│   └── monitoring/
-│       ├── prometheus-config.yaml
-│       └── grafana-dashboard.json
-├── scripts/
-│   ├── setup.sh
-│   ├── train_model.py
-│   ├── deploy.sh
-│   └── test_api.py
-├── monitoring/
-│   ├── drift_detection.py
-│   └── alerting_rules.yaml
-├── tests/
-│   ├── test_model.py
-│   ├── test_api.py
-│   └── test_pipeline.py
-├── requirements.txt
-├── Dockerfile
-├── README.md
-└── .gitignore
-```
 
 ## 🛠️ Instalación y Configuración
-
-### Prerrequisitos
-
-- Python 3.9+
-- Docker Desktop
-- Azure CLI
-- kubectl
-- Git
 
 ### 1. Clonar el Repositorio
 
@@ -143,7 +77,7 @@ Crear archivo `.env` en la raíz del proyecto:
 
 ```bash
 # Azure Configuration
-AZURE_SUBSCRIPTION_ID=your-subscription-id
+AZURE_SUBSCRIPTION_ID=subscription-id
 AZURE_RESOURCE_GROUP=ml-devops-rg
 AZURE_LOCATION=eastus
 ACR_NAME=mldevopsacr
@@ -170,7 +104,7 @@ GRAFANA_PORT=3000
 az login
 
 # Establecer suscripción
-az account set --subscription "your-subscription-id"
+az account set --subscription "subscription-id"
 
 # Crear grupo de recursos
 az group create --name ml-devops-rg --location eastus
@@ -183,9 +117,6 @@ az group create --name ml-devops-rg --location eastus
 ```bash
 # Ejecutar script de entrenamiento
 python scripts/train_model.py
-
-# O usar el pipeline completo
-python pipelines/training_pipeline.py
 ```
 
 ### Opción 2: Entrenamiento en Azure ML
@@ -200,8 +131,6 @@ python pipelines/azure_ml_pipeline.py
 
 ### Métricas del Modelo
 
-El entrenamiento genera las siguientes métricas:
-
 - **R² Score**: Coeficiente de determinación
 - **MAE (Mean Absolute Error)**: Error absoluto medio
 - **RMSE (Root Mean Square Error)**: Raíz del error cuadrático medio
@@ -215,9 +144,6 @@ R² Score: 0.8542
 MAE: 2.1456
 RMSE: 3.2789
 Training Time: 0.45 seconds
-
-Model saved to: models/housing_model_v1.2.3.pkl
-MLflow Run ID: 1a2b3c4d5e6f7g8h9i0j
 ```
 
 ## 🐳 Containerización
@@ -567,44 +493,6 @@ pip install locust
 locust -f tests/load_test.py --host=http://localhost:8000
 ```
 
-## 🔄 CI/CD Pipeline
-
-### GitHub Actions Workflows
-
-#### 1. CI Pipeline (.github/workflows/ci-cd.yml)
-- **Trigger**: Push a main/develop
-- **Steps**:
-  - Checkout código
-  - Setup Python
-  - Install dependencias
-  - Run tests
-  - Build Docker image
-  - Push to ACR
-  - Deploy to AKS
-
-#### 2. Model Training (.github/workflows/model-training.yml)
-- **Trigger**: Schedule (semanal) o manual
-- **Steps**:
-  - Fetch latest data
-  - Run training pipeline
-  - Validate model performance
-  - Update model registry
-  - Trigger deployment si aprobado
-
-### Configurar Secrets en GitHub
-
-```bash
-# Secrets requeridos en GitHub:
-AZURE_CREDENTIALS          # Service Principal JSON
-AZURE_SUBSCRIPTION_ID      # Azure Subscription ID
-ACR_LOGIN_SERVER          # ACR login server
-ACR_USERNAME              # ACR username
-ACR_PASSWORD              # ACR password
-KUBE_CONFIG               # Kubernetes config
-```
-
-## 🔧 Troubleshooting
-
 ### Problemas Comunes
 
 #### 1. Error de Conexión a Azure
@@ -692,33 +580,7 @@ kubectl port-forward deployment/housing-prediction 8000:8000
 | Disco | 20% | 70% |
 | Red | 15 Mbps | 100 Mbps |
 
-## 🔐 Seguridad
-
-### Mejores Prácticas Implementadas
-
-1. **Container Security**:
-   - Non-root user en Docker
-   - Minimal base image (Python slim)
-   - Security scanning con Trivy
-
-2. **Kubernetes Security**:
-   - Resource limits y requests
-   - Network policies
-   - RBAC configurado
-   - Secrets management
-
-3. **API Security**:
-   - Rate limiting
-   - Input validation
-   - CORS configurado
-   - Health checks
-
-4. **Data Security**:
-   - Encryption at rest
-   - Secure connections (TLS)
-   - No sensitive data in logs
-
-## 📚 Documentación Adicional
+## 📚 Documentación
 
 ### Referencias
 
@@ -736,36 +598,6 @@ kubectl port-forward deployment/housing-prediction 8000:8000
 3. [Monitoring Setup](docs/tutorials/monitoring-setup.md)
 4. [CI/CD Pipeline Configuration](docs/tutorials/cicd-setup.md)
 
-## 🤝 Contribuir
-
-### Proceso de Contribución
-
-1. Fork el repositorio
-2. Crear feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit cambios (`git commit -m 'Add amazing feature'`)
-4. Push branch (`git push origin feature/amazing-feature`)
-5. Abrir Pull Request
-
-### Coding Standards
-
-- **Python**: Seguir PEP 8
-- **Docstrings**: Usar formato Google
-- **Type Hints**: Obligatorios para funciones públicas
-- **Tests**: Cobertura mínima 80%
-
-### Pre-commit Hooks
-
-```bash
-# Instalar pre-commit
-pip install pre-commit
-
-# Instalar hooks
-pre-commit install
-
-# Ejecutar manualmente
-pre-commit run --all-files
-```
-
 ## 📝 Changelog
 
 ### v1.0.0 (2024-XX-XX)
@@ -782,34 +614,6 @@ pre-commit run --all-files
 - 🔄 A/B testing framework
 - 🔄 Multi-model serving
 
-## 📞 Soporte
+## 📞 Contacto
 
-### Contacto
-
-- **Email**: tu-email@ejemplo.com
-- **Slack**: #ml-devops-support
-- **GitHub Issues**: [Issues](https://github.com/tu-usuario/ml-devops-housing-prediction/issues)
-
-### FAQ
-
-**Q: ¿Cómo actualizo el modelo en producción?**
-A: El modelo se actualiza automáticamente cuando se hace push a la rama main y pasa todos los tests. También se puede actualizar manualmente usando `kubectl set image`.
-
-**Q: ¿Cómo escalo la aplicación?**
-A: Usar `kubectl scale deployment housing-prediction --replicas=5` o configurar HPA (Horizontal Pod Autoscaler).
-
-**Q: ¿Cómo accedo a los logs en producción?**
-A: Usar `kubectl logs -l app=housing-prediction -f` o acceder a Azure Monitor/Log Analytics.
-
-**Q: ¿Cómo configuro alertas personalizadas?**
-A: Modificar el archivo `monitoring/alerting_rules.yaml` y aplicar con `kubectl apply -f monitoring/`.
-
----
-
-## 📄 Licencia
-
-Este proyecto está licenciado bajo la MIT License - ver el archivo [LICENSE](LICENSE) para detalles.
-
----
-
-**Desarrollado con ❤️ para la comunidad MLOps**
+- **Email**: crbellor@unal.edu.co
