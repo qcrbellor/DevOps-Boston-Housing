@@ -136,10 +136,9 @@ python pipelines/azure_ml_pipeline.py
 - **RMSE (Root Mean Square Error)**: Raíz del error cuadrático medio
 - **Feature Importance**: Importancia de cada característica
 
-### Ejemplo de Salida del Entrenamiento
+### Ejemplo:
 
 ```
-=== Model Training Results ===
 R² Score: 0.8542
 MAE: 2.1456
 RMSE: 3.2789
@@ -348,27 +347,7 @@ result = response.json()
 print(f"Predicted price: ${result['prediction']:.2f}")
 ```
 
-## 📊 Monitoreo y Observabilidad
-
-### Métricas Monitoreadas
-
-#### Métricas de Sistema
-- **CPU Usage**: Uso de CPU por pod
-- **Memory Usage**: Uso de memoria por pod
-- **Network I/O**: Tráfico de red
-- **Disk I/O**: Operaciones de disco
-
-#### Métricas de Aplicación
-- **Request Rate**: Peticiones por segundo
-- **Response Time**: Tiempo de respuesta (p50, p95, p99)
-- **Error Rate**: Tasa de errores (4xx, 5xx)
-- **Prediction Distribution**: Distribución de predicciones
-
-#### Métricas de Modelo
-- **Prediction Latency**: Tiempo de inferencia
-- **Model Accuracy**: Exactitud del modelo (cuando hay ground truth)
-- **Feature Drift**: Cambios en la distribución de features
-- **Prediction Drift**: Cambios en la distribución de predicciones
+## 📊 Monitoreo
 
 ### Configuración de Prometheus
 
@@ -385,16 +364,7 @@ scrape_configs:
     scrape_interval: 10s
 ```
 
-### Dashboards de Grafana
-
-Se incluyen dashboards predefinidos para:
-
-1. **System Overview**: Métricas generales del sistema
-2. **API Performance**: Rendimiento de la API
-3. **Model Monitoring**: Monitoreo específico del modelo
-4. **Alerting**: Estado de alertas y notificaciones
-
-### Acceder a Grafana
+### Configuración de Grafana
 
 ```bash
 # Port forward para acceder localmente
@@ -493,62 +463,6 @@ pip install locust
 locust -f tests/load_test.py --host=http://localhost:8000
 ```
 
-### Problemas Comunes
-
-#### 1. Error de Conexión a Azure
-```bash
-# Verificar autenticación
-az account show
-
-# Re-autenticar si es necesario
-az login
-```
-
-#### 2. Pods No Inician en AKS
-```bash
-# Verificar logs
-kubectl logs -l app=housing-prediction
-
-# Verificar recursos
-kubectl describe pod <pod-name>
-
-# Verificar secrets
-kubectl get secrets
-```
-
-#### 3. API Retorna 500 Error
-```bash
-# Verificar logs de la aplicación
-kubectl logs -f deployment/housing-prediction
-
-# Verificar health endpoint
-curl http://<external-ip>/health
-```
-
-#### 4. Modelo No Carga
-```bash
-# Verificar que el modelo existe
-ls -la models/
-
-# Verificar variables de entorno
-kubectl get configmap housing-config -o yaml
-```
-
-### Logs y Debugging
-
-```bash
-# Ver logs de diferentes componentes
-kubectl logs -l app=housing-prediction -f
-kubectl logs -l app=prometheus -f
-kubectl logs -l app=grafana -f
-
-# Exec into pod para debugging
-kubectl exec -it <pod-name> -- /bin/bash
-
-# Port forward para debugging local
-kubectl port-forward deployment/housing-prediction 8000:8000
-```
-
 ## 📈 Métricas de Performance
 
 ### Benchmarks del Modelo
@@ -591,28 +505,6 @@ kubectl port-forward deployment/housing-prediction 8000:8000
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Grafana Documentation](https://grafana.com/docs/)
 
-### Tutoriales
-
-1. [Setting up MLOps with Azure ML](docs/tutorials/azure-ml-setup.md)
-2. [Kubernetes Deployment Guide](docs/tutorials/k8s-deployment.md)
-3. [Monitoring Setup](docs/tutorials/monitoring-setup.md)
-4. [CI/CD Pipeline Configuration](docs/tutorials/cicd-setup.md)
-
-## 📝 Changelog
-
-### v1.0.0 (2024-XX-XX)
-- ✅ Pipeline de entrenamiento automatizado
-- ✅ API REST con FastAPI
-- ✅ Despliegue en AKS
-- ✅ Monitoreo con Prometheus/Grafana
-- ✅ CI/CD con GitHub Actions
-- ✅ Documentación completa
-
-### v1.1.0 (Próxima Release)
-- 🔄 Detección de drift automática
-- 🔄 Reentrenamiento automático
-- 🔄 A/B testing framework
-- 🔄 Multi-model serving
 
 ## 📞 Contacto
 
