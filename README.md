@@ -51,8 +51,7 @@ Este proyecto implementa una solución de MLOps para un modelo de predicción de
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/ml-devops-housing-prediction.git
-cd ml-devops-housing-prediction
+git clone https://github.com/qcrbellor/DevOps-Boston-Housing.git
 ```
 
 ### 2. Configurar Entorno Virtual
