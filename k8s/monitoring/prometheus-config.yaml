@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+      - "rules.yml"
+    
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+    
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+      
+      - job_name: 'housing-price-api'
+        kubernetes_sd_configs:
+          - role: endpoints
+            namespaces:
+              names:
+                - ml-housing-app
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            action: keep
+            regex: housing-price-service
+          - source_labels: [__meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: http
+        metrics_path: /metrics
+        scrape_interval: 10s
+
+  rules.yml: |
+    groups:
+      - name: housing_api_alerts
+        rules:
+          - alert: HighLatency
+            expr: histogram_quantile(0.95, http_request_duration_seconds_bucket{job="housing-price-api"}) > 0.5
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High latency detected"
+              description: "95th percentile latency is {{ $value }}s"
+          
+          - alert: HighErrorRate
+            expr: rate(http_requests_total{job="housing-price-api",status=~"5.."}[5m]) > 0.1
+            for: 2m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate detected"
+              description: "Error rate is {{ $value }} errors per second"
+          
+          - alert: ModelPredictionDrift
+            expr: prediction_drift_score > 0.8
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Model prediction drift detected"
+              description: "Drift score is {{ $value }}"

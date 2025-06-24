@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: housing-price-service
+  namespace: ml-housing-app
+  labels:
+    app: housing-price-api
+spec:
+  selector:
+    app: housing-price-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+  type: ClusterIP
