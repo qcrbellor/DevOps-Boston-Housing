@@ -1,15 +1,12 @@
-#!/bin/bash
 # scripts/deploy.sh - Script principal de despliegue
 
 set -e
 
-# Colores para outputs
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Variables de configuración
 RESOURCE_GROUP="ml-housing-rg"
 LOCATION="eastus"
 AKS_CLUSTER_NAME="ml-housing-aks"
@@ -18,7 +15,7 @@ APP_NAME="housing-price-api"
 
 echo -e "${GREEN}=== ML Housing Price Deployment Script ===${NC}"
 
-# Función para logging
+# Logging
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
 }
@@ -32,41 +29,40 @@ warn() {
     echo -e "${YELLOW}[WARNING] $1${NC}"
 }
 
-# Verificar Azure CLI
+# Azure CLI
 if ! command -v az &> /dev/null; then
-    error "Azure CLI no está instalado. Instálalo desde: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"
+    error "Azure CLI no está instalado. Instálación: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli"
 fi
 
-# Verificar kubectl
+# Kubectl
 if ! command -v kubectl &> /dev/null; then
-    error "kubectl no está instalado. Instálalo desde: https://kubernetes.io/docs/tasks/tools/"
+    error "kubectl no está instalado. Instálación: https://kubernetes.io/docs/tasks/tools/"
 fi
 
-# Verificar Docker
+# Docker
 if ! command -v docker &> /dev/null; then
-    error "Docker no está instalado. Instálalo desde: https://docs.docker.com/get-docker/"
+    error "Docker no está instalado. Instálación: https://docs.docker.com/get-docker/"
 fi
 
-# Login a Azure
+# Login Azure
 log "Verificando login de Azure..."
 if ! az account show &> /dev/null; then
     log "Haciendo login a Azure..."
     az login
 fi
 
-# Crear grupo de recursos
 log "Creando grupo de recursos..."
 az group create --name $RESOURCE_GROUP --location $LOCATION
 
-# Crear Azure Container Registry
+# Azure Container Registry
 log "Creando Azure Container Registry..."
 az acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic
 
-# Habilitar admin user para ACR
+# Admin user para ACR
 log "Habilitando admin user para ACR..."
 az acr update -n $ACR_NAME --admin-enabled true
 
-# Crear AKS cluster
+# AKS cluster
 log "Creando AKS cluster (esto puede tomar varios minutos)..."
 az aks create \
     --resource-group $RESOURCE_GROUP \
@@ -77,7 +73,7 @@ az aks create \
     --attach-acr $ACR_NAME \
     --generate-ssh-keys
 
-# Obtener credenciales de AKS
+# AKS
 log "Obteniendo credenciales de AKS..."
 az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER_NAME
 
@@ -102,11 +98,10 @@ kubectl create secret docker-registry acr-secret \
     --docker-password=$(az acr credential show --name $ACR_NAME --query passwords[0].value --output tsv) \
     --namespace=ml-housing-app || true
 
-# Aplicar manifiestos de Kubernetes
+# Kubernetes
 log "Aplicando manifiestos de Kubernetes..."
 kubectl apply -f k8s/
 
-# Esperar a que los pods estén listos
 log "Esperando a que los pods estén listos..."
 kubectl wait --for=condition=available --timeout=300s deployment/housing-price-api -n ml-housing-app
 

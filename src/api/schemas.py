@@ -1,14 +1,9 @@
-"""
-Pydantic schemas for API request/response models.
-"""
-
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 
 class HousingFeatures(BaseModel):
-    """Input features for housing price prediction."""
     
     crim: float = Field(..., description="Per capita crime rate by town", ge=0)
     zn: float = Field(..., description="Proportion of residential land zoned for lots over 25,000 sq.ft", ge=0, le=100)
@@ -57,7 +52,6 @@ class HousingFeatures(BaseModel):
 
 
 class PredictionRequest(BaseModel):
-    """Request model for single prediction."""
     
     features: HousingFeatures
     model_version: Optional[str] = Field(None, description="Specific model version to use")
@@ -86,7 +80,6 @@ class PredictionRequest(BaseModel):
 
 
 class BatchPredictionRequest(BaseModel):
-    """Request model for batch predictions."""
     
     features: List[HousingFeatures]
     model_version: Optional[str] = Field(None, description="Specific model version to use")
@@ -101,7 +94,6 @@ class BatchPredictionRequest(BaseModel):
 
 
 class PredictionResponse(BaseModel):
-    """Response model for single prediction."""
     
     prediction: float = Field(..., description="Predicted housing price in thousands of dollars")
     model_version: str = Field(..., description="Model version used for prediction")
@@ -125,7 +117,6 @@ class PredictionResponse(BaseModel):
 
 
 class BatchPredictionResponse(BaseModel):
-    """Response model for batch predictions."""
     
     predictions: List[float] = Field(..., description="List of predicted housing prices")
     model_version: str = Field(..., description="Model version used for predictions")
@@ -146,7 +137,6 @@ class BatchPredictionResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
-    """Health check response model."""
     
     status: str = Field(..., description="Service status")
     version: str = Field(..., description="API version")
@@ -169,7 +159,6 @@ class HealthResponse(BaseModel):
 
 
 class MetricsResponse(BaseModel):
-    """Metrics response model."""
     
     total_predictions: int = Field(..., description="Total number of predictions served")
     predictions_per_minute: float = Field(..., description="Recent predictions per minute")
@@ -192,7 +181,6 @@ class MetricsResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """Error response model."""
     
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Error message")

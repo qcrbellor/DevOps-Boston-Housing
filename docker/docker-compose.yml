@@ -74,7 +74,7 @@ services:
       - ml-network
     restart: unless-stopped
 
-  # Grafana for visualization
+  # Grafana
   grafana:
     image: grafana/grafana:latest
     container_name: grafana

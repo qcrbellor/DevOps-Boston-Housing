@@ -1,6 +1,3 @@
-#!/bin/bash
-# scripts/setup-monitoring.sh - Configurar monitoreo completo
-
 set -e
 
 GREEN='\033[0;32m'
@@ -17,23 +14,20 @@ warn() {
 
 log "=== Configurando Monitoreo Completo ==="
 
-# Crear namespace de monitoreo
+# Namespace de monitoreo
 log "Creando namespace de monitoreo..."
 kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
 
-# Aplicar configuraciones de monitoreo
 log "Aplicando configuraciones de Prometheus y Grafana..."
 kubectl apply -f monitoring/
 
-# Esperar a que Prometheus esté listo
 log "Esperando a que Prometheus esté listo..."
 kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n monitoring
 
-# Esperar a que Grafana esté listo
 log "Esperando a que Grafana esté listo..."
 kubectl wait --for=condition=available --timeout=300s deployment/grafana -n monitoring
 
-# Obtener IPs de servicios
+# IPs
 log "Obteniendo información de servicios..."
 PROMETHEUS_IP=$(kubectl get service prometheus -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 GRAFANA_IP=$(kubectl get service grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
@@ -42,7 +36,7 @@ log "Configuración de monitoreo completada!"
 log "Prometheus: http://$PROMETHEUS_IP:9090"
 log "Grafana: http://$GRAFANA_IP:3000 (admin/admin123)"
 
-# Crear dashboard de Grafana
+# Dashboard Grafana
 log "Configurando dashboard de Grafana..."
 cat > /tmp/housing-dashboard.json << 'EOF'
 {
@@ -183,9 +177,9 @@ while true; do
     METRICS_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $API_URL/metrics)
     
     if [ "$HEALTH_STATUS" = "200" ] && [ "$READY_STATUS" = "200" ]; then
-        echo "[$TIMESTAMP] ✅ Servicio saludable (Health: $HEALTH_STATUS, Ready: $READY_STATUS, Metrics: $METRICS_STATUS)"
+        echo "[$TIMESTAMP] Servicio saludable (Health: $HEALTH_STATUS, Ready: $READY_STATUS, Metrics: $METRICS_STATUS)"
     else
-        echo "[$TIMESTAMP] ❌ Servicio con problemas (Health: $HEALTH_STATUS, Ready: $READY_STATUS, Metrics: $METRICS_STATUS)"
+        echo "[$TIMESTAMP] Servicio con problemas (Health: $HEALTH_STATUS, Ready: $READY_STATUS, Metrics: $METRICS_STATUS)"
         
         # Opcional: enviar alerta
         # curl -X POST "https://hooks.slack.com/services/YOUR/WEBHOOK/URL" \
@@ -238,8 +232,8 @@ log "Script de backup creado: scripts/backup-model.sh"
 log "¡Configuración de monitoreo completada exitosamente!"
 log ""
 log "Comandos útiles:"
-log "- Test de carga: ./scripts/load-test.sh http://your-api-url"
-log "- Monitor de salud: ./scripts/health-monitor.sh http://your-api-url"
+log "- Test de carga: ./scripts/load-test.sh"
+log "- Monitor de salud: ./scripts/health-monitor.sh"
 log "- Backup del modelo: ./scripts/backup-model.sh"
 log ""
 log "Acceso a servicios:"

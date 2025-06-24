@@ -1,7 +1,3 @@
-"""
-Model training module with MLflow integration.
-"""
-
 import pandas as pd
 import numpy as np
 import yaml
@@ -20,23 +16,22 @@ logger = logging.getLogger(__name__)
 
 
 class ModelTrainer:
-    """Handle model training with MLflow tracking."""
-    
+
     def __init__(self, config_path: str = "config/config.yaml"):
         """Initialize ModelTrainer with configuration."""
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
         
-        # Initialize MLflow
+        # Initialize
         self.setup_mlflow()
         
     def setup_mlflow(self) -> None:
-        """Setup MLflow tracking."""
+
         mlflow.set_tracking_uri(self.config['mlflow']['tracking_uri'])
         mlflow.set_experiment(self.config['mlflow']['experiment_name'])
         
     def create_model(self) -> RandomForestRegressor:
-        """Create model with configured hyperparameters."""
+
         model_config = self.config['model']
         
         if model_config['type'] == 'RandomForestRegressor':
@@ -47,11 +42,11 @@ class ModelTrainer:
         return model
     
     def evaluate_model(self, model: RandomForestRegressor, X_test: pd.DataFrame, y_test: pd.Series) -> Dict[str, float]:
-        """Evaluate model performance."""
+
         # Predictions
         y_pred = model.predict(X_test)
         
-        # Calculate metrics
+        # Metrics
         metrics = {
             'r2_score': r2_score(y_test, y_pred),
             'mse': mean_squared_error(y_test, y_pred),
@@ -62,7 +57,7 @@ class ModelTrainer:
         return metrics
     
     def cross_validate_model(self, model: RandomForestRegressor, X_train: pd.DataFrame, y_train: pd.Series) -> Dict[str, float]:
-        """Perform cross-validation."""
+
         cv_folds = self.config['training']['cross_validation_folds']
         
         # Cross-validation scores
@@ -79,7 +74,7 @@ class ModelTrainer:
         return cv_metrics
     
     def feature_importance(self, model: RandomForestRegressor, feature_names: list) -> Dict[str, float]:
-        """Get feature importances."""
+
         if hasattr(model, 'feature_importances_'):
             importance_dict = dict(zip(feature_names, model.feature_importances_))
             # Sort by importance
@@ -88,7 +83,7 @@ class ModelTrainer:
         return {}
     
     def validate_model_performance(self, metrics: Dict[str, float]) -> bool:
-        """Validate if model meets performance thresholds."""
+
         thresholds = self.config['training']['metric_threshold']
         
         if metrics['r2_score'] < thresholds['r2_score']:
@@ -120,7 +115,6 @@ class ModelTrainer:
     
     def train_model(self, X_train: pd.DataFrame, X_test: pd.DataFrame, 
                    y_train: pd.Series, y_test: pd.Series) -> Tuple[RandomForestRegressor, Dict[str, Any]]:
-        """Complete model training pipeline with MLflow tracking."""
         
         with mlflow.start_run():
             logger.info("Starting model training")

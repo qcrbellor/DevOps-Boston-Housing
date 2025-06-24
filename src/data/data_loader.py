@@ -1,5 +1,5 @@
 """
-Data loading and preprocessing module for Boston Housing dataset.
+Data loading and preprocessing for Boston Housing dataset.
 """
 
 import pandas as pd
@@ -15,19 +15,16 @@ logger = logging.getLogger(__name__)
 
 
 class DataLoader:
-    """Handle data loading and preprocessing for Boston Housing dataset."""
     
     def __init__(self, config_path: str = "config/config.yaml"):
-        """Initialize DataLoader with configuration."""
         with open(config_path, 'r') as file:
             self.config = yaml.safe_load(file)
         
         self.scaler = StandardScaler()
         
     def download_data(self) -> pd.DataFrame:
-        """Download dataset from URL."""
         try:
-            url = self.config['data']['source_url']
+            url = self.config['data']['https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv']
             logger.info(f"Downloading data from {url}")
             
             response = requests.get(url)
@@ -57,16 +54,13 @@ class DataLoader:
         return df
     
     def preprocess_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Preprocess the dataset."""
-        # Create a copy to avoid modifying original
+
         df_processed = df.copy()
         
-        # Handle missing values
         if df_processed.isnull().sum().any():
             logger.warning("Missing values found, filling with median")
             df_processed = df_processed.fillna(df_processed.median())
         
-        # Feature engineering
         df_processed['rm_squared'] = df_processed['rm'] ** 2
         df_processed['age_per_room'] = df_processed['age'] / df_processed['rm']
         
@@ -89,7 +83,7 @@ class DataLoader:
         return df_processed
     
     def split_data(self, df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
-        """Split data into train and test sets."""
+
         target_col = self.config['data']['target_column']
         
         X = df.drop(columns=[target_col])
@@ -108,7 +102,7 @@ class DataLoader:
         return X_train, X_test, y_train, y_test
     
     def scale_features(self, X_train: pd.DataFrame, X_test: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """Scale numerical features."""
+
         numerical_features = self.config['features']['numerical_features']
         
         # Add engineered features to numerical list
@@ -148,7 +142,7 @@ class DataLoader:
         return stats
     
     def prepare_data_pipeline(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series, Dict]:
-        """Complete data preparation pipeline."""
+
         logger.info("Starting data preparation pipeline")
         
         # Load data

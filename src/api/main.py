@@ -1,4 +1,4 @@
-# api/main.py - API con métricas integradas
+# API con métricas integradas
 import os
 import time
 import logging
@@ -14,7 +14,7 @@ from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTEN
 from starlette.responses import Response
 import json
 
-# Configuración de logging
+# Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -25,7 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Métricas de Prometheus
+# Métricas Prometheus
 REQUEST_COUNT = Counter(
     'http_requests_total',
     'Total HTTP requests',
@@ -69,7 +69,7 @@ ERROR_COUNT = Counter(
     ['error_type']
 )
 
-# Modelos de datos
+# Modelo
 class HouseFeatures(BaseModel):
     crim: float = Field(..., description="Per capita crime rate")
     zn: float = Field(..., description="Proportion of residential land zoned for lots over 25,000 sq.ft")
@@ -163,14 +163,13 @@ class ModelManager:
         start_time = time.time()
         
         try:
-            # Escalar features
             features_scaled = self.scaler.transform(features)
             
             # Predicción
             prediction = self.model.predict(features_scaled)[0]
             
-            # Calcular intervalo de confianza (simulado)
-            # En un caso real, usarías métodos como bootstrap o modelos bayesianos
+            # Simulación del intervalo
+            # En un caso real, usara modelos bayesianos
             std_error = self.model_metrics.get('mae', 3.0)  # Usar MAE como proxy
             confidence_interval = {
                 "lower": float(prediction - 1.96 * std_error),
@@ -183,7 +182,7 @@ class ModelManager:
             
             # Almacenar predicción para detección de drift
             current_predictions.append(prediction)
-            if len(current_predictions) > 1000:  # Mantener últimas 1000 predicciones
+            if len(current_predictions) > 1000:
                 current_predictions.pop(0)
             
             return prediction, confidence_interval
@@ -270,14 +269,12 @@ async def predict_price(features: HouseFeatures):
         raise HTTPException(status_code=503, detail="Model not loaded")
     
     try:
-        # Convertir a array numpy
         feature_array = np.array([[
             features.crim, features.zn, features.indus, features.chas,
             features.nox, features.rm, features.age, features.dis,
             features.rad, features.tax, features.ptratio, features.b, features.lstat
         ]])
         
-        # Realizar predicción
         prediction, confidence_interval = model_manager.predict(feature_array)
         
         return PredictionResponse(
@@ -351,14 +348,12 @@ async def check_drift():
         return {"drift_score": 0.0, "status": "insufficient_data"}
     
     try:
-        # Calcular drift simple usando diferencia de medias
         baseline_mean = np.mean(baseline_predictions)
         current_mean = np.mean(current_predictions[-100:])  # Últimas 100 predicciones
         
         baseline_std = np.std(baseline_predictions)
         current_std = np.std(current_predictions[-100:])
         
-        # Drift score basado en diferencia normalizada
         mean_drift = abs(current_mean - baseline_mean) / baseline_std if baseline_std > 0 else 0
         std_drift = abs(current_std - baseline_std) / baseline_std if baseline_std > 0 else 0
         
@@ -397,7 +392,6 @@ async def get_stats():
         "uptime": time.time() - start_time if 'start_time' in globals() else 0
     }
 
-# Inicializar tiempo de inicio
 start_time = time.time()
 
 if __name__ == "__main__":
